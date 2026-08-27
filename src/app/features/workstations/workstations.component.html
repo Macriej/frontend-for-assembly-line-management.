@@ -1,0 +1,92 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Workstations</h1>
+      <div class="page-subtitle">Physical stations that can be allocated to assembly lines.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Short name</mat-label>
+        <input matInput formControlName="shortName" placeholder="e.g. LW" />
+        @if (form.controls.shortName.hasError('required') && form.controls.shortName.touched) {
+          <mat-error>Required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" placeholder="e.g. Laser welding" />
+        @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+          <mat-error>Required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>PC name</mat-label>
+        <input matInput formControlName="pcName" placeholder="e.g. PC-LW-01" />
+        @if (form.controls.pcName.hasError('required') && form.controls.pcName.touched) {
+          <mat-error>Required</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="form-actions">
+        <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || saving()">
+          {{ editingId() ? 'Save changes' : 'Add workstation' }}
+        </button>
+        @if (editingId()) {
+          <button mat-button type="button" (click)="cancelEdit()">Cancel</button>
+        }
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    @if (!loading() && workstations().length === 0) {
+      <div class="empty-state">No workstations yet — add the first one above.</div>
+    } @else {
+      <table mat-table [dataSource]="workstations()" class="full-width-table">
+        <ng-container matColumnDef="shortName">
+          <th mat-header-cell *matHeaderCellDef>Short name</th>
+          <td mat-cell *matCellDef="let ws">{{ ws.shortName }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let ws">{{ ws.name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="pcName">
+          <th mat-header-cell *matHeaderCellDef>PC name</th>
+          <td mat-cell *matCellDef="let ws">{{ ws.pcName }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="allocations">
+          <th mat-header-cell *matHeaderCellDef>Allocations</th>
+          <td mat-cell *matCellDef="let ws">{{ ws.count?.allocations ?? 0 }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let ws">
+            <button mat-icon-button (click)="edit(ws)" aria-label="Edit" title="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="remove(ws)" aria-label="Delete" title="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns"></tr>
+      </table>
+    }
+  </div>
+</div>

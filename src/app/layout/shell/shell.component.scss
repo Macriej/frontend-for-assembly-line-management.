@@ -1,0 +1,37 @@
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  gap: 8px;
+}
+.brand-icon {
+  margin-right: 8px;
+}
+.brand {
+  font-weight: 500;
+  margin-right: 24px;
+  white-space: nowrap;
+}
+.nav-links {
+  display: flex;
+  gap: 4px;
+}
+.active-link {
+  background: rgba(255, 255, 255, 0.15);
+}
+.spacer {
+  flex: 1 1 auto;
+}
+.user-email {
+  font-size: 13px;
+  opacity: 0.85;
+  margin-right: 4px;
+}
+@media (max-width: 720px) {
+  .brand {
+    display: none;
+  }
+  .user-email {
+    display: none;
+  }
+}

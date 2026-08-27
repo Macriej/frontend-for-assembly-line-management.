@@ -1,0 +1,105 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <a mat-button routerLink="/assembly-lines" class="back-link">
+        <mat-icon>arrow_back</mat-icon>
+        Assembly lines
+      </a>
+      <h1>{{ line()?.name ?? 'Allocations' }}</h1>
+      @if (line(); as l) {
+        <div class="page-subtitle">
+          {{ l.product?.name }} ·
+          <mat-chip [class.active-chip]="l.active" [class.inactive-chip]="!l.active">
+            {{ l.active ? 'Active' : 'Inactive' }}
+          </mat-chip>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (!loading()) {
+    <p class="instructions">
+      Drag workstations between the columns, or use the arrow buttons. Reordering the right
+      column changes the order they run in on this line.
+    </p>
+
+    <div class="board" cdkDropListGroup>
+      <div class="card column">
+        <h2>Available workstations</h2>
+        <div
+          cdkDropList
+          [id]="availableListId"
+          [cdkDropListConnectedTo]="[allocatedListId]"
+          [cdkDropListData]="available()"
+          (cdkDropListDropped)="drop($event)"
+          class="drop-list"
+        >
+          @if (available().length === 0) {
+            <div class="empty-state small">
+              {{ allocated().length ? 'All workstations are allocated.' : 'No workstations exist yet.' }}
+            </div>
+          }
+          @for (ws of available(); track ws.id) {
+            <div cdkDrag class="item" [cdkDragDisabled]="saving()">
+              <mat-icon class="drag-handle" cdkDragHandle>drag_indicator</mat-icon>
+              <div class="item-body">
+                <div class="item-title">{{ ws.name }}</div>
+                <div class="item-subtitle">{{ ws.shortName }} · {{ ws.pcName }}</div>
+              </div>
+              <button
+                mat-icon-button
+                (click)="quickAdd(ws)"
+                [disabled]="saving()"
+                aria-label="Allocate to this line"
+                title="Allocate to this line"
+              >
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="card column">
+        <h2>Allocated (in order)</h2>
+        <div
+          cdkDropList
+          [id]="allocatedListId"
+          [cdkDropListConnectedTo]="[availableListId]"
+          [cdkDropListData]="allocated()"
+          (cdkDropListDropped)="drop($event)"
+          class="drop-list"
+        >
+          @if (allocated().length === 0) {
+            <div class="empty-state small">Drag workstations here to build the line's pipeline.</div>
+          }
+          @for (allocation of allocated(); track allocation.id; let i = $index) {
+            <div cdkDrag class="item" [cdkDragDisabled]="saving()">
+              <mat-icon class="drag-handle" cdkDragHandle>drag_indicator</mat-icon>
+              <div class="order-badge">{{ i + 1 }}</div>
+              <div class="item-body">
+                <div class="item-title">{{ allocation.workstation.name }}</div>
+                <div class="item-subtitle">
+                  {{ allocation.workstation.shortName }} · {{ allocation.workstation.pcName }}
+                </div>
+              </div>
+              <button
+                mat-icon-button
+                (click)="removeViaButton(allocation)"
+                [disabled]="saving()"
+                aria-label="Remove from this line"
+                title="Remove from this line"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,21 @@
+<mat-toolbar color="primary" class="toolbar">
+  <mat-icon class="brand-icon">precision_manufacturing</mat-icon>
+  <span class="brand">Assembly Line Manager</span>
+
+  <nav class="nav-links">
+    <a mat-button routerLink="/products" routerLinkActive="active-link">Products</a>
+    <a mat-button routerLink="/assembly-lines" routerLinkActive="active-link">Assembly lines</a>
+    <a mat-button routerLink="/workstations" routerLinkActive="active-link">Workstations</a>
+  </nav>
+
+  <span class="spacer"></span>
+
+  @if (authService.currentUser(); as user) {
+    <span class="user-email">{{ user.email }}</span>
+  }
+  <button mat-icon-button (click)="logout()" aria-label="Log out" title="Log out">
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>
+
+<router-outlet></router-outlet>
