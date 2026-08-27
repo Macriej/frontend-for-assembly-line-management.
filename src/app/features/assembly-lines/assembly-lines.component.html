@@ -1,0 +1,109 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Assembly lines</h1>
+      <div class="page-subtitle">Production lines, each tied to one product.</div>
+    </div>
+
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Filter by product</mat-label>
+      <mat-select [value]="filterProductId()" (selectionChange)="onFilterChange($event.value)">
+        <mat-option [value]="null">All products</mat-option>
+        @for (product of products(); track product.id) {
+          <mat-option [value]="product.id">{{ product.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="card">
+    @if (products().length === 0 && !loading()) {
+      <p class="empty-state">Add a product first — every assembly line belongs to one.</p>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Line name</mat-label>
+          <input matInput formControlName="name" placeholder="e.g. Convey line" />
+          @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+            <mat-error>Name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Product</mat-label>
+          <mat-select formControlName="productId">
+            @for (product of products(); track product.id) {
+              <mat-option [value]="product.id">{{ product.name }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.productId.hasError('required') && form.controls.productId.touched) {
+            <mat-error>Product is required</mat-error>
+          }
+        </mat-form-field>
+        <mat-checkbox formControlName="active" class="active-checkbox">Active</mat-checkbox>
+        <div class="form-actions">
+          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || saving()">
+            {{ editingId() ? 'Save changes' : 'Add line' }}
+          </button>
+          @if (editingId()) {
+            <button mat-button type="button" (click)="cancelEdit()">Cancel</button>
+          }
+        </div>
+      </form>
+    }
+  </div>
+
+  <div class="card">
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    @if (!loading() && lines().length === 0) {
+      <div class="empty-state">No assembly lines match this filter yet.</div>
+    } @else {
+      <table mat-table [dataSource]="lines()" class="full-width-table">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let line">{{ line.name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="product">
+          <th mat-header-cell *matHeaderCellDef>Product</th>
+          <td mat-cell *matCellDef="let line">{{ line.product?.name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let line">
+            <mat-chip [class.inactive-chip]="!line.active" [class.active-chip]="line.active">
+              {{ line.active ? 'Active' : 'Inactive' }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let line">
+            <a
+              mat-icon-button
+              [routerLink]="['/assembly-lines', line.id, 'allocations']"
+              aria-label="Manage allocations"
+              title="Manage allocations"
+            >
+              <mat-icon>view_list</mat-icon>
+            </a>
+            <button mat-icon-button (click)="edit(line)" aria-label="Edit" title="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="remove(line)" aria-label="Delete" title="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns"></tr>
+      </table>
+    }
+  </div>
+</div>

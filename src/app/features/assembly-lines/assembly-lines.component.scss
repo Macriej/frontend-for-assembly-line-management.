@@ -1,0 +1,15 @@
+.filter-field {
+  min-width: 220px;
+}
+.active-checkbox {
+  align-self: center;
+  padding-bottom: 25px;
+}
+.active-chip {
+  background: #e3f4e6 !important;
+  color: #1e7d32 !important;
+}
+.inactive-chip {
+  background: #f1f1f1 !important;
+  color: rgba(0, 0, 0, 0.6) !important;
+}
